@@ -31,15 +31,15 @@ methods.set('/posts.get', function({response}) {
 });
 methods.set('/posts.getById', function({response, searchParams}) {
     const idParam = Number(searchParams.get('id'));
-    if((!searchParams.has('id')) || (Number.isNaN(idParam))) {
+    if ((!searchParams.has('id')) || (Number.isNaN(idParam))) {
         sendResponse(response, {status: statusBadRequest});
         return;
     }
 
     let key;
     for (key in posts) {
-        let idpost = Number(`${posts[key].id}`);
-        if(idParam === idpost) {
+        const idpost = Number(`${posts[key].id}`);
+        if (idParam === idpost) {
             const post = {
                 id: idpost,
                 content: `${posts[key].content}`,
@@ -48,8 +48,8 @@ methods.set('/posts.getById', function({response, searchParams}) {
             sendJSON(response, post);
             return post;
         }
-        if(idParam !== idpost) {
-            sendResponse(response, {status: statusNotFound})
+        if (idParam !== idpost) {
+            sendResponse(response, {status: statusNotFound});
             return;
         }
     }
@@ -71,15 +71,15 @@ methods.set('/posts.post', function({response, searchParams}) {
     posts.unshift(post);
     sendJSON(response, post);
 });
-methods.set('/posts.edit', function(request, response) {});
-methods.set('/posts.delete', function(request, response) {});
+methods.set('/posts.edit', function() {});
+methods.set('/posts.delete', function() {});
 
 const server = http.createServer((request, response) => {
     const {pathname, searchParams} = new URL(request.url, `http://${request.headers.host}`);
     
     const method = methods.get(pathname);
     if (method === undefined) {
-        sendResponse(response, {status: statusNotFound})
+        sendResponse(response, {status: statusNotFound});
         return;
     }
 
