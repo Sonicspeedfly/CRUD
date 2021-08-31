@@ -29,7 +29,31 @@ const methods = new Map();
 methods.set('/posts.get', function({response}) {
     sendJSON(response, posts);
 });
-methods.set('/posts.getById', function() {});
+methods.set('/posts.getById', function({response, searchParams}) {
+    const idParam = Number(searchParams.get('id'));
+    if((!searchParams.has('id')) || (Number.isNaN(idParam))) {
+        sendResponse(response, {status: statusBadRequest});
+        return;
+    }
+
+    let key;
+    for (key in posts) {
+        let idpost = Number(`${posts[key].id}`);
+        if(idParam === idpost) {
+            const post = {
+                id: idpost,
+                content: `${posts[key].content}`,
+                created: `${posts[key].created}`,
+            };
+            sendJSON(response, post);
+            return post;
+        }
+        if(idParam !== idpost) {
+            sendResponse(response, {status: statusNotFound})
+            return;
+        }
+    }
+});
 methods.set('/posts.post', function({response, searchParams}) {
     if (!searchParams.has('content')) {
         sendResponse(response, {status: statusBadRequest});
