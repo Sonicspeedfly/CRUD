@@ -27,7 +27,10 @@ function sendJSON(response, body) {
 
 const methods = new Map();
 methods.set('/posts.get', function({response}) {
-    sendJSON(response, posts);
+    const postsNotRemoved = posts.filter(function({removed}) {
+        return removed === false;
+    });
+    sendJSON(response, postsNotRemoved);
 });
 methods.set('/posts.getById', function({response, searchParams}) {
     const idParam = Number(searchParams.get('id'));
@@ -39,10 +42,11 @@ methods.set('/posts.getById', function({response, searchParams}) {
     let key;
     for (key in posts) {
         const idpost = Number(`${posts[key].id}`);
-        if (idParam === idpost) {
+        if ((idParam === idpost) && (posts[key].removed === false)) {
             const post = {
                 id: idpost,
                 content: `${posts[key].content}`,
+                removed: `${posts[key].removed}`,
                 created: `${posts[key].created}`,
             };
             found = true;
@@ -67,6 +71,7 @@ methods.set('/posts.post', function({response, searchParams}) {
     const post = {
         id: nextId++,
         content: content,
+        removed: false,
         created: Date.now(),
     };
 
@@ -83,11 +88,12 @@ methods.set('/posts.edit', function({response, searchParams}) {
     let key;
     for (key in posts) {
         const idpost = Number(`${posts[key].id}`);
-        if (idParam === idpost) {
+        if ((idParam === idpost) && (posts[key].removed === false)) {
             posts[key].content = searchParams.get('content');
             const post = {
                 id: idpost,
                 content: searchParams.get('content'),
+                removed: `${posts[key].removed}`,
                 created: `${posts[key].created}`,
             };
             found = true;
@@ -111,13 +117,14 @@ methods.set('/posts.delete', function({response, searchParams}) {
     let key;
     for (key in posts) {
         const idpost = Number(`${posts[key].id}`);
-        if (idParam === idpost) {
+        if ((idParam === idpost) && (posts[key].removed === false)) {
+            posts[key].removed = true;
             const post = {
                 id: idpost,
                 content: `${posts[key].content}`,
+                removed: `${posts[key].removed}`,
                 created: `${posts[key].created}`,
             };
-            posts.splice(key, key += 1);
             found = true;
             sendJSON(response, post);
             return post;
