@@ -46,8 +46,10 @@ methods.set('/posts.getById', function({response, searchParams}) {
             const post = {
                 id: idpost,
                 content: `${posts[key].content}`,
+                removed: posts[key].removed,
                 created: `${posts[key].created}`,
             };
+            console.log(typeof post.removed)
             found = true;
             sendJSON(response, post);
             return post;
@@ -92,6 +94,7 @@ methods.set('/posts.edit', function({response, searchParams}) {
             const post = {
                 id: idpost,
                 content: searchParams.get('content'),
+                removed: posts[key].removed,
                 created: `${posts[key].created}`,
             };
             found = true;
@@ -120,6 +123,7 @@ methods.set('/posts.delete', function({response, searchParams}) {
             const post = {
                 id: idpost,
                 content: `${posts[key].content}`,
+                removed: posts[key].removed,
                 created: `${posts[key].created}`,
             };
             found = true;
