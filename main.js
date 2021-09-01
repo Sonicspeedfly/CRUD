@@ -160,6 +160,9 @@ methods.set('/posts.restore', function({response, searchParams}) {
             sendJSON(response, post);
             return post;
         }
+        if (idParam === idpost) {
+            found = true;
+        }
     }
     if (found === false) {
         sendResponse(response, {status: statusNotFound});
