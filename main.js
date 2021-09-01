@@ -136,6 +136,41 @@ methods.set('/posts.delete', function({response, searchParams}) {
     }
     found = false;
 });
+methods.set('/posts.restore', function({response, searchParams}) {
+    const idParam = Number(searchParams.get('id'));
+    let removed = false;
+    let found = false;
+    let key;
+    for (key in posts) {
+        const idpost = Number(`${posts[key].id}`);
+        if ((idParam === idpost) && (posts[key].removed === true)) {
+            posts[key].removed = false;
+            const post = {
+                id: idpost,
+                content: `${posts[key].content}`,
+                removed: posts[key].removed,
+                created: `${posts[key].created}`,
+            };
+            removed = true;
+            found = true;
+            sendJSON(response, post);
+            return post;
+        }
+        if (idParam === idpost) {
+            found = true;
+        }
+    }
+    if (found === false) {
+        sendResponse(response, {status: statusNotFound});
+        return;
+    }
+    if ((!searchParams.has('id')) || (Number.isNaN(idParam)) || (removed === false)) {
+        sendResponse(response, {status: statusBadRequest});
+        return;
+    }
+    found = false;
+    removed = false;
+});
 
 const server = http.createServer((request, response) => {
     const {pathname, searchParams} = new URL(request.url, `http://${request.headers.host}`);
