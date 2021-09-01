@@ -101,7 +101,34 @@ methods.set('/posts.edit', function({response, searchParams}) {
     }
     found = false;
 });
-methods.set('/posts.delete', function() {});
+methods.set('/posts.delete', function({response, searchParams}) {
+    const idParam = Number(searchParams.get('id'));
+    if ((!searchParams.has('id')) || (Number.isNaN(idParam))) {
+        sendResponse(response, {status: statusBadRequest});
+        return;
+    }
+    let found = false;
+    let key;
+    for (key in posts) {
+        const idpost = Number(`${posts[key].id}`);
+        if (idParam === idpost) {
+            const post = {
+                id: idpost,
+                content: `${posts[key].content}`,
+                created: `${posts[key].created}`,
+            };
+            posts.splice(key, key += 1);
+            found = true;
+            sendJSON(response, post);
+            return post;
+        }   
+    }
+    if (found === false) {
+        sendResponse(response, {status: statusNotFound});
+        return;
+    }
+    found = false;
+});
 
 const server = http.createServer((request, response) => {
     const {pathname, searchParams} = new URL(request.url, `http://${request.headers.host}`);
