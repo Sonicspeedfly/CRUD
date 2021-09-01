@@ -137,6 +137,10 @@ methods.set('/posts.delete', function({response, searchParams}) {
     found = false;
 });
 methods.set('/posts.restore', function({response, searchParams}) {
+    if ((!searchParams.has('id')) || (Number.isNaN(idParam))) {
+        sendResponse(response, {status: statusBadRequest});
+        return;
+    }
     const idParam = Number(searchParams.get('id'));
     let removed = false;
     let found = false;
@@ -156,18 +160,16 @@ methods.set('/posts.restore', function({response, searchParams}) {
             sendJSON(response, post);
             return post;
         }
-        if (idParam === idpost) {
-            found = true;
-        }
     }
     if (found === false) {
         sendResponse(response, {status: statusNotFound});
         return;
     }
-    if ((!searchParams.has('id')) || (Number.isNaN(idParam)) || (removed === false)) {
+    if (removed === false) {
         sendResponse(response, {status: statusBadRequest});
         return;
     }
+
     found = false;
     removed = false;
 });
