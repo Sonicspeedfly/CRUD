@@ -137,11 +137,11 @@ methods.set('/posts.delete', function({response, searchParams}) {
     found = false;
 });
 methods.set('/posts.restore', function({response, searchParams}) {
+    const idParam = Number(searchParams.get('id'));
     if ((!searchParams.has('id')) || (Number.isNaN(idParam))) {
         sendResponse(response, {status: statusBadRequest});
         return;
     }
-    const idParam = Number(searchParams.get('id'));
     let removed = false;
     let found = false;
     let key;
