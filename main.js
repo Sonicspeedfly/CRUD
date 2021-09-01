@@ -35,7 +35,7 @@ methods.set('/posts.getById', function({response, searchParams}) {
         sendResponse(response, {status: statusBadRequest});
         return;
     }
-
+    let found = false;
     let key;
     for (key in posts) {
         const idpost = Number(`${posts[key].id}`);
@@ -45,14 +45,16 @@ methods.set('/posts.getById', function({response, searchParams}) {
                 content: `${posts[key].content}`,
                 created: `${posts[key].created}`,
             };
+            found = true;
             sendJSON(response, post);
             return post;
-        }
-        if (idParam !== idpost) {
-            sendResponse(response, {status: statusNotFound});
-            return;
-        }
+        }   
     }
+    if (found === false) {
+        sendResponse(response, {status: statusNotFound});
+        return;
+    }
+    found = false;
 });
 methods.set('/posts.post', function({response, searchParams}) {
     if (!searchParams.has('content')) {
@@ -71,7 +73,34 @@ methods.set('/posts.post', function({response, searchParams}) {
     posts.unshift(post);
     sendJSON(response, post);
 });
-methods.set('/posts.edit', function() {});
+methods.set('/posts.edit', function({response, searchParams}) {
+    const idParam = Number(searchParams.get('id'));
+    if ((!searchParams.has('id')) || (Number.isNaN(idParam)) || (!searchParams.has('content'))) {
+        sendResponse(response, {status: statusBadRequest});
+        return;
+    }
+    let found = false;
+    let key;
+    for (key in posts) {
+        const idpost = Number(`${posts[key].id}`);
+        if (idParam === idpost) {
+            posts[key].content = searchParams.get('content');
+            const post = {
+                id: idpost,
+                content: searchParams.get('content'),
+                created: `${posts[key].created}`,
+            };
+            found = true;
+            sendJSON(response, post);
+            return post;
+        }   
+    }
+    if (found === false) {
+        sendResponse(response, {status: statusNotFound});
+        return;
+    }
+    found = false;
+});
 methods.set('/posts.delete', function() {});
 
 const server = http.createServer((request, response) => {
