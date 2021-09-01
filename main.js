@@ -49,7 +49,6 @@ methods.set('/posts.getById', function({response, searchParams}) {
                 removed: posts[key].removed,
                 created: `${posts[key].created}`,
             };
-            console.log(typeof post.removed)
             found = true;
             sendJSON(response, post);
             return post;
